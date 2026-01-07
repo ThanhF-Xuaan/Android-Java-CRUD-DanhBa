@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BaiThucHanh04Bai01">
         <activity
+            android:name=".ManHinhThem"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

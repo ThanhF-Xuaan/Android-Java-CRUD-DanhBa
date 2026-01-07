@@ -1,14 +1,19 @@
 package com.thanhlx.baithuchanh04_bai01;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -20,21 +25,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ListView lsvDanhBa;
     ArrayAdapter<Contact> adapter;
     private String DATABASE_NAME = "Contacs.db";
     String DB_PATH_SUFFIX = "/databases/";
-    SQLiteDatabase database = null;
+    public static SQLiteDatabase database = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.btnSave), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -77,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         cursor.close();
-        database.close();
+//        database.close();
     }
 
     private void addVies() {
@@ -145,5 +149,34 @@ public class MainActivity extends AppCompatActivity {
             //ex.toString(): Tên loại lỗi + Thông điệp chi tiết.
             Log.e("Error: ", ex.toString());
         }
+    }
+
+    //them menu option
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //Lệnh này thực hiện việc "bơm" (inflate) các mục menu từ file XML vào thanh tiêu đề.
+        getMenuInflater().inflate(R.menu.menu_option, menu);
+        return true;
+    }
+
+    //lua chon option nao cua menu option
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.mnuThem){
+            //Tạo một "bản tin" (Intent) để thông báo cho hệ thống rằng bạn muốn đi từ màn hình hiện tại (MainActivity.this)
+            // sang màn hình mới (ManHinhThem.class).
+            Intent intent = new Intent(MainActivity.this, ManHinhThem.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Gọi lại hàm hiển thị để cập nhật dữ liệu mới nhất từ SQLite
+        hienThiDanhBa();
     }
 }
