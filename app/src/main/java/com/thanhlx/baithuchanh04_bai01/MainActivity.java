@@ -5,8 +5,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -33,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     String DB_PATH_SUFFIX = "/databases/";
     public static SQLiteDatabase database = null;
 
+    public static Contact selectedContact;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +54,27 @@ public class MainActivity extends AppCompatActivity {
         addVies();
 
         hienThiDanhBa();
+
+        addEvents();
+    }
+
+    private void addEvents() {
+        lsvDanhBa.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedContact = adapter.getItem(position);
+            }
+        });
+
+        lsvDanhBa.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedContact = adapter.getItem(position);
+                //false: Sau khi thực hiện lệnh gán dữ liệu, hệ thống sẽ coi như sự kiện này chưa kết thúc.
+                // Điều này cho phép Android tiếp tục hiển thị các menu phụ (như Context Menu - menu nổi lên để chọn Xóa/Sửa) nếu bạn có cài đặt.
+                return false;
+            }
+        });
     }
 
     private void hienThiDanhBa() {
@@ -90,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
         // Nó định nghĩa rằng mỗi dòng trong danh sách sẽ chỉ là một dòng chữ đơn giản (TextView).
         adapter = new ArrayAdapter<Contact>(MainActivity.this, android.R.layout.simple_list_item_1);
         lsvDanhBa.setAdapter(adapter);
+
+        registerForContextMenu(lsvDanhBa);
     }
 
     //ham thuc hien copy vao dien thoai
@@ -171,6 +199,23 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getMenuInflater().inflate(R.menu.menu_context, menu);
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId()==R.id.mnuChinhSua){
+            if(selectedContact != null){
+                Intent intent = new Intent(MainActivity.this, ManHinhChinhSua.class);
+                startActivity(intent);
+            }
+        }
+        return super.onContextItemSelected(item);
     }
 
     @Override
