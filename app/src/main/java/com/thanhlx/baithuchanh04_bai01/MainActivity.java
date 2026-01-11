@@ -1,5 +1,6 @@
 package com.thanhlx.baithuchanh04_bai01;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -214,8 +216,41 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, ManHinhChinhSua.class);
                 startActivity(intent);
             }
+        } else if(item.getItemId()==R.id.mnuXoa){
+            if(selectedContact != null){
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Xac nhan xoa danh ba");
+                builder.setMessage("Ban co thuc su muon xoa danh ba nay hay khong?");
+                builder.setIcon(android.R.drawable.ic_dialog_alert);
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        xoaDanhBa();
+                        hienThiDanhBa();
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.create().show();
+            }
         }
         return super.onContextItemSelected(item);
+    }
+
+    private void xoaDanhBa() {
+        int kq = database.delete("contact", "id=?",
+                new String[]{selectedContact.getId() + ""});
+        if(kq > 0){
+            Toast.makeText(MainActivity.this, "Xoa danh ba thanh cong", Toast.LENGTH_LONG);
+        }
+        else{
+            Toast.makeText(MainActivity.this, "Xoa danh ba that bai", Toast.LENGTH_LONG);
+        }
     }
 
     @Override
